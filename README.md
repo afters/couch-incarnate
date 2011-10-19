@@ -57,7 +57,7 @@ With the above configuration, at least two incarnations would be created. Both w
 
 ### Example ###
 
-Say your application holds documents in the DB looking like this:
+Let's say your application holds documents in a DB called 'my_db', which look like this:
 
     {
       type: "user",
@@ -65,11 +65,11 @@ Say your application holds documents in the DB looking like this:
       join_date: "2011/05/29", // YYYY/MM/DD
     }
 
-You want to have an incarnation holding the number of users that join each year. The incarnator configuration would look like this:
+Now say you want to have an incarnation holding the number of users that join each year. The incarnator configuration would look like this:
 
     {
       "source": "http://localhost:5984/my_db",
-      "map": "function (doc) { if (doc.type === "player") emit(doc.join_date.split('/')[0], null); }",
+      "map": "function (doc) { if (doc.type === "user") emit(doc.join_date.split('/')[0], null); }",
       "reduces": {
         "count": {
           "function": "function (key, values, rereduce) { if (!rereduce) return {count: values.length}; var count = 0; for (var i = 0; i < values.length; i++) { count += values[i]; }; return count; }",
@@ -78,11 +78,11 @@ You want to have an incarnation holding the number of users that join each year.
       }
     }
 
-If you wanted also to have incarnations for the number of players that join each month, and each day, the incarnator configuration could look like this:
+If you wanted also to have incarnations for the number of users that join each month, and each day, the incarnator configuration could look like this:
 
     {
       "source": "http://localhost:5984/my_db",
-      "map": "function (doc) { if (doc.type === "player") emit(doc.join_date.split('/'), null); }",
+      "map": "function (doc) { if (doc.type === "user") emit(doc.join_date.split('/'), null); }",
       "reduces": {
         "count": {
           "function": "function (key, values, rereduce) { if (!rereduce) return {count: values.length}; var count = 0; for (var i = 0; i < values.length; i++) { count += values[i]; }; return count; }",
