@@ -176,7 +176,7 @@ var server = http.createServer( function (req, res) {
           sendMsg(msgs.NO_SUCH_INCARNATOR);
           return;
         }
-        incarnatorHandlers[incarnatorId].getState(reqId, function (err, state) {
+        incarnatorHandlers[incarnatorId].getIncarnatorState(reqId, function (err, state) {
           if (err) {
             if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATOR) {
               sendMsg(msgs.NO_SUCH_INCARNATOR);
@@ -204,7 +204,7 @@ var server = http.createServer( function (req, res) {
               sendMsg(msgs.SERVER_ERROR);
               return;
             }
-            incarnatorHandlers[incarnatorId].setup(incarnatorConf, reqId, function (err) {
+            incarnatorHandlers[incarnatorId].setupIncarnator(incarnatorConf, reqId, function (err) {
               if (err) {
                 sendMsg(msgs.SERVER_ERROR);
               }
@@ -223,7 +223,7 @@ var server = http.createServer( function (req, res) {
           sendMsg(msgs.NO_SUCH_INCARNATOR);
           return;
         }
-        incarnatorHandlers[incarnatorId].destroy(reqId, function (err) {
+        incarnatorHandlers[incarnatorId].destroyIncarnator(reqId, function (err) {
           if (err) {
             if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATOR) {
               sendMsg(msgs.NO_SUCH_INCARNATOR);
@@ -261,7 +261,7 @@ var server = http.createServer( function (req, res) {
         sendMsg(msgs.NO_SUCH_INCARNATOR);
         return;
       }
-      incarnatorHandlers[incarnatorId].dbRequest({reName: reduceId, groupLevel: groupLevel, req: req, reqId: reqId}, function (err, ret) {
+      incarnatorHandlers[incarnatorId].incarnationRequest({reName: reduceId, groupLevel: groupLevel, req: req, reqId: reqId}, function (err, ret) {
         if (err) {
           if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATOR) {
             sendMsg(msgs.NO_SUCH_INCARNATOR);
