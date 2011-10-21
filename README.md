@@ -148,7 +148,6 @@ If INCARNATOR\_NAME exists, overwrite it.
 ## TODO ##
 
 - tests. Does this thing really work?
-- plug memory leak by deleting done incarnator-handlers
 - input validation
 - verify persistence
 - throttle couchdb multi-queries
@@ -161,7 +160,6 @@ If INCARNATOR\_NAME exists, overwrite it.
 - limited input validation
 - limited error-handling
 - persistence still requires a little more work
-- memory leaks when accessing non-existing incarnators
 - big source DB changes between incarnation updates probably wouldn't work
 - only JS map and reduce functions are supported
 - map functions aren't sandboxed
