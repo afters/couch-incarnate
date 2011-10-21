@@ -17,18 +17,6 @@ var log = new Logger({
     fs.createWriteStream(conf.log.path, {flags: 'a+', mode: 0666}) : null,
   ignore: conf.log ? conf.log.ignore : null
 });
-var statesDir = conf.home;
-var syncCallbacks = {};
-
-var errs = (function () {
-  var errors = {};
-  var errNames = [
-    "NO_SUCH_DB",
-    "ERR_LOAD_INC"
-  ];
-  errNames.forEach(function (errName, i) { errors[errName] = i; });
-  return errors;
-})();
 
 var IncarnatorHandlers = function () {
   var handlers = [];
