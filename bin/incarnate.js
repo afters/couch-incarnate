@@ -30,6 +30,131 @@ var errs = (function () {
   return errors;
 })();
 
+var IncarnatorHandlers = function () {
+  var handlers = [];
+
+  var ensureHandlerExists = function (incarnatorId, cb) {
+    var newHandler;
+    if (!handlers[incarnatorId]) {
+      newHandler = new IncarnatorHandler({
+        id: incarnatorId, 
+        couchUrl: conf.couch, 
+        persister: new Persister(conf.home + '/' + incarnatorId + '.state'),
+        log: log
+      });
+      newHandler.init( function (err) {
+        if (err) {
+        log.info('failed to initialize handler for incarnator ' + incarnatorId);
+          cb(new Error());
+          return;
+        }
+        log.info('successfully initialized handler for incarnator ' + incarnatorId);
+        handlers[incarnatorId] = newHandler;
+        cb();
+      });
+      return;
+    }
+    cb();
+  }
+
+  var handlerCall = function (incarnatorId, fnName, args) {
+    ensureHandlerExists(incarnatorId, function (err) {
+      var handler = handlers[incarnatorId];
+      var origCb = args[args.length - 1];
+      if (err) {
+        origCb(new HandlersError(IncarnatorHandlers.errorCodes.SERVER_ERROR));
+        return;
+      }
+      var newCb = function () {
+        if (!handler.incarnatorExists() && !handler.isInUse()) {
+          delete handlers[incarnatorId];
+        }
+        origCb.apply(this, arguments);
+      }
+      var argsWithModifiedCb = [].concat(args);
+      argsWithModifiedCb[argsWithModifiedCb.length - 1] = newCb;
+      handler[fnName].apply(handler, argsWithModifiedCb);
+    });
+  }
+
+  this.setupIncarnator = function (incarnatorId, incarnatorConf, reqId, cb) {
+    handlerCall(incarnatorId, "setupIncarnator", [incarnatorConf, reqId, function (err) {
+      if (err) {
+        cb(new HandlersError(IncarnatorHandlers.errorCodes.SERVER_ERROR));
+      }
+      else {
+        cb();
+      }
+    }]);
+  }
+
+  this.destroyIncarnator = function (incarnatorId, reqId, cb) {
+    handlerCall(incarnatorId, "destroyIncarnator", [reqId, function (err) {
+      if (err) {
+        if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATOR) {
+          cb(new HandlersError(IncarnatorHandlers.errorCodes.NO_SUCH_INCARNATOR));
+        }
+        else {
+          cb(new HandlersError(IncarnatorHandlers.errorCodes.SERVER_ERROR));
+        }
+      }
+      else {
+        cb();
+      }
+    }]);
+  }
+
+  this.getIncarnatorState = function (incarnatorId, reqId, cb) {
+    handlerCall(incarnatorId, "getIncarnatorState", [reqId, function (err, state) {
+      if (err) {
+        if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATOR) {
+          cb(new HandlersError(IncarnatorHandlers.errorCodes.NO_SUCH_INCARNATOR));
+        }
+        else {
+          cb(new HandlersError(IncarnatorHandlers.errorCodes.SERVER_ERROR));
+        }
+      }
+      else {
+        cb(null, state);
+      }
+    }]);
+  }
+
+  this.incarnationRequest = function (incarnatorId, opts, cb) {
+    handlerCall(incarnatorId, "incarnationRequest", [opts, function (err, ret) {
+      if (err) {
+        if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATOR) {
+          cb(new HandlersError(IncarnatorHandlers.errorCodes.NO_SUCH_INCARNATOR));
+        }
+        else if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATION) {
+          cb(new HandlersError(IncarnatorHandlers.errorCodes.NO_SUCH_INCARNATION));
+        }
+        else {
+          cb(new HandlersError(IncarnatorHandlers.errorCodes.SERVER_ERROR));
+        }
+      }
+      else {
+        cb(null, ret);
+      }
+    }]);
+  }
+}
+
+IncarnatorHandlers.errorCodes = {
+  NO_SUCH_INCARNATION: 0,
+  NO_SUCH_INCARNATOR: 1,
+  SERVER_ERROR: 2,
+  INCARNATOR_DELETED: 3
+}
+
+var HandlersError = function (errCode) {
+  Error.apply(this);
+  this.code = errCode;
+}
+util.inherits(HandlersError, Error);
+
+var incarnatorHandlers = new IncarnatorHandlers();
+
 var msgs = {
   INC_READY: {
     statusCode: 200,
@@ -85,31 +210,6 @@ var msgs = {
   }
 }
 
-var incarnatorHandlers = [];
-
-var ensureHandlerExists = function (incarnatorId, cb) {
-  var newHandler;
-  if (!incarnatorHandlers[incarnatorId]) {
-    newHandler = new IncarnatorHandler({
-      id: incarnatorId, 
-      couchUrl: conf.couch, 
-      persister: new Persister(conf.home + '/' + incarnatorId + '.state'),
-      log: log
-    });
-    newHandler.init( function (err) {
-      if (err) {
-      log.info('failed to initialize handler for incarnator ' + incarnatorId);
-        cb(new Error());
-        return;
-      }
-      log.info('successfully initialized handler for incarnator ' + incarnatorId);
-      incarnatorHandlers[incarnatorId] = newHandler;
-      cb();
-    });
-    return;
-  }
-  cb();
-}
 
 var server = http.createServer( function (req, res) {
   reqId = Math.random();
@@ -171,24 +271,21 @@ var server = http.createServer( function (req, res) {
     // GET '/inc_name'
     if (req.method === 'GET') {
       log.trace(reqId + '\t' + 'get state of incarnator ' + incarnatorId);
-      ensureHandlerExists(incarnatorId, function (err) {
+      incarnatorHandlers.getIncarnatorState(incarnatorId, reqId, function (err, state) {
         if (err) {
-          sendMsg(msgs.NO_SUCH_INCARNATOR);
-          return;
-        }
-        incarnatorHandlers[incarnatorId].getIncarnatorState(reqId, function (err, state) {
-          if (err) {
-            if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATOR) {
-              sendMsg(msgs.NO_SUCH_INCARNATOR);
-            }
-            else {
-              sendMsg(msgs.SERVER_ERROR);
-            }
+          if (err.code === IncarnatorHandlers.errorCodes.NO_SUCH_INCARNATOR) {
+            sendMsg(msgs.NO_SUCH_INCARNATOR);
+          }
+          else if (err.code === IncarnatorHandlers.errorCodes.NO_SUCH_INCARNATION) {
+            sendMsg(msgs.NO_SUCH_INCARNATION);
           }
           else {
-            send(200, state);
+            sendMsg(msgs.SERVER_ERROR);
           }
-        });
+        }
+        else {
+          send(200, state);
+        }
       });
     }
     // PUT '/incarnator_name'
@@ -199,43 +296,31 @@ var server = http.createServer( function (req, res) {
         }
         else {
           log.trace(reqId + '\t' + 'call setup incarnator ' + incarnatorId);
-          ensureHandlerExists(incarnatorId, function (err) {
+          incarnatorHandlers.setupIncarnator(incarnatorId, incarnatorConf, reqId, function (err) {
             if (err) {
               sendMsg(msgs.SERVER_ERROR);
-              return;
             }
-            incarnatorHandlers[incarnatorId].setupIncarnator(incarnatorConf, reqId, function (err) {
-              if (err) {
-                sendMsg(msgs.SERVER_ERROR);
-              }
-              else {
-                sendMsg(msgs.INC_SETUP_SUCCESSFUL);
-              }
-            });
+            else {
+              sendMsg(msgs.INC_SETUP_SUCCESSFUL);
+            }
           });
         }
       });
     }
     else if (req.method === 'DELETE') {
       log.trace(reqId + '\t' + 'destroy incarnator ' + incarnatorId);
-      ensureHandlerExists(incarnatorId, function (err) {
+      incarnatorHandlers.destroyIncarnator(incarnatorId, reqId, function (err) {
         if (err) {
-          sendMsg(msgs.NO_SUCH_INCARNATOR);
-          return;
-        }
-        incarnatorHandlers[incarnatorId].destroyIncarnator(reqId, function (err) {
-          if (err) {
-            if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATOR) {
-              sendMsg(msgs.NO_SUCH_INCARNATOR);
-            }
-            else {
-              sendMsg(msgs.SERVER_ERROR);
-            }
+          if (err.code === IncarnatorHandlers.errorCodes.NO_SUCH_INCARNATOR) {
+            sendMsg(msgs.NO_SUCH_INCARNATOR);
           }
           else {
-            sendMsg(msgs.INC_DELETED);
+            sendMsg(msgs.SERVER_ERROR);
           }
-        });
+        }
+        else {
+          sendMsg(msgs.INC_DELETED);
+        }
       });
     }
     else {
@@ -256,31 +341,25 @@ var server = http.createServer( function (req, res) {
   else {
     log.trace(reqId + '\t' + 'send db-req to incarnator ' + incarnatorId + 
       ' gl: ' + groupLevel + ' reName: ' + reduceId);
-    ensureHandlerExists(incarnatorId, function (err) {
+    incarnatorHandlers.incarnationRequest(incarnatorId, {reName: reduceId, groupLevel: groupLevel, req: req, reqId: reqId}, function (err, ret) {
       if (err) {
-        sendMsg(msgs.NO_SUCH_INCARNATOR);
-        return;
-      }
-      incarnatorHandlers[incarnatorId].incarnationRequest({reName: reduceId, groupLevel: groupLevel, req: req, reqId: reqId}, function (err, ret) {
-        if (err) {
-          if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATOR) {
-            sendMsg(msgs.NO_SUCH_INCARNATOR);
-          }
-          else if (err.code === IncarnatorHandler.errorCodes.NO_SUCH_INCARNATION) {
-            sendMsg(msgs.NO_SUCH_INCARNATION);
-          }
-          else {
-            sendMsg(msgs.SERVER_ERROR);
-          }
+        if (err.code === IncarnatorHandlers.errorCodes.NO_SUCH_INCARNATOR) {
+          sendMsg(msgs.NO_SUCH_INCARNATOR);
+        }
+        else if (err.code === IncarnatorHandlers.errorCodes.NO_SUCH_INCARNATION) {
+          sendMsg(msgs.NO_SUCH_INCARNATION);
         }
         else {
-          res.writeHead(ret.res.statusCode, ret.res.headers);
-          if (ret.body) {
-            res.write(ret.body, 'utf8');
-          }
-          res.end();
+          sendMsg(msgs.SERVER_ERROR);
         }
-      });
+      }
+      else {
+        res.writeHead(ret.res.statusCode, ret.res.headers);
+        if (ret.body) {
+          res.write(ret.body, 'utf8');
+        }
+        res.end();
+      }
     });
   }
 });
