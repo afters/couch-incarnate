@@ -150,7 +150,6 @@ If INCARNATOR\_NAME exists, overwrite it.
 - tests. Does this thing really work?
 - input validation
 - verify persistence
-- throttle couchdb multi-queries
 - sandbox JS map functions
 - _changes
 
@@ -160,7 +159,6 @@ If INCARNATOR\_NAME exists, overwrite it.
 - limited input validation
 - limited error-handling
 - persistence still requires a little more work
-- big source DB changes between incarnation updates probably wouldn't work
 - only JS map and reduce functions are supported
 - map functions aren't sandboxed
 - no SSL
