@@ -145,6 +145,12 @@ If INCARNATOR\_NAME exists, overwrite it.
 
     METHOD_NAME /INCARNATOR_NAME/REDUCE_NAME/GROUP_LEVEL/[...]
 
+## Persistence ##
+
+Persistence is aimed to be on par with CouchDB's. 
+
+Note: currently, unless running on Mac OS X, both CouchDB and Incarnate would provide absolute disk-persistence only if the disk has no cache on-board, or if the disk has a back-up power supply, in case of a power failure. See here for more: http://lwn.net/Articles/270891/
+
 ## TODO ##
 
 - tests. Does this thing really work?
@@ -158,7 +164,6 @@ If INCARNATOR\_NAME exists, overwrite it.
 - not properly tested
 - limited input validation
 - limited error-handling
-- persistence still requires a little more work
 - only JS map and reduce functions are supported
 - map functions aren't sandboxed
 - no SSL
