@@ -3,7 +3,7 @@ Couch Incarnate
 
 A CouchDB tool for maintaining views of views (AKA chaining map-reduce operations).
 
-### Requirements ###
+## Requirements ##
 
 *   Node.js (tried on 0.4.5)
 *   CouchDB (tried on 1.0.1)
@@ -15,13 +15,13 @@ A CouchDB tool for maintaining views of views (AKA chaining map-reduce operation
 *   go into the files' directory
 *   run:
 
-       npm install request
+         npm install request
 
 *   edit 'conf' file (if you wish)
 *   create the 'log' directory (detailed in 'conf'). Make sure you have permission to write to it
 *   done! Now run:
 
-       ./bin/incarnate.js
+         ./bin/incarnate.js
 
 ## Incarnation - the basic concept ##
 
