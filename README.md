@@ -7,7 +7,7 @@ CouchDB views in DB-form; for chaining map-reduce operations.
 (This is by no means production-ready. See 'caveats' at the bottom.)
 
 ## Installation ##
-*   create the 'log' and 'home' directories as detailed in the 'conf' file
+*   create the 'log' directory as detailed in the 'conf' file
 *   run:
 
        ./bin/incarnate.js
@@ -100,7 +100,6 @@ An HTTP server that administrates and maintains incarnations
 Configuration file - ./conf :
 
     {
-      "home": "/var/lib/incarnate/",
       "port": 4895,
       "couch": "http://localhost:5984",
       "log": {

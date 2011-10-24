@@ -1,5 +1,4 @@
 {
-  "home": "/var/lib/incarnate/",
   "port": 4895,
   "couch": "http://localhost:5984",
   "log": {
