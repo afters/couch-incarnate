@@ -154,7 +154,6 @@ Note: currently, unless running on Mac OS X, both CouchDB and Incarnate would pr
 
 - tests. Does this thing really work?
 - input validation
-- verify persistence
 - sandbox JS map functions
 - _changes
 
