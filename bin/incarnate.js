@@ -4,7 +4,7 @@ var util = require('util'),
   fs = require('fs'),
   url_lib = require('url'),
   http = require('http'),
-  Persister = require('../lib/fs_persister'),
+  Persister = require('../lib/couch_persister'),
   Logger = require('../lib/logger'),
   IncarnatorHandler = require('../lib/incarnatorHandler');
 
@@ -27,7 +27,7 @@ var IncarnatorHandlers = function () {
       newHandler = new IncarnatorHandler({
         id: incarnatorId, 
         couchUrl: conf.couch, 
-        persister: new Persister(conf.home + '/' + incarnatorId + '.state'),
+        persister: new Persister(conf.couch, 'incarnate', incarnatorId),
         log: log
       });
       newHandler.init( function (err) {
