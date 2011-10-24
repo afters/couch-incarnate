@@ -1,10 +1,7 @@
 Couch Incarnate
 ===============
 
-CouchDB views in DB-form; for chaining map-reduce operations.
-
-
-(This is by no means production-ready. See 'caveats' at the bottom.)
+A CouchDB tool for maintaining views of views (AKA chaining map-reduce operations).
 
 ## Installation ##
 *   create the 'log' directory as detailed in the 'conf' file
@@ -20,9 +17,11 @@ CouchDB views in DB-form; for chaining map-reduce operations.
 
 ## Incarnation - the basic concept ##
 
-An incarnation is a CouchDB that is equivalent to a CouchDB view. Each document in it is of the form '{key: ..., value: ...}'.
+An incarnation is a CouchDB that is equivalent to a CouchDB view. Like a view, this DB is based on map and reduce functions, and each document in it is of the form '{key: ..., value: ...}'.
 
-An incarnation is based on a source DB, a map-function, a reduce function, and a group-level. 
+Once an incarnation is set up, you could add to it a design-doc with a view (or more), ending up with what is effectively a view of a view.
+
+More specifically, an incarnation is based on a source DB, a map-function, a reduce function, and a group-level. 
 
 Contents are equivalent to the following query, if instead of an incarnation, a normal view were used, with the same map and reduce functions:
 
