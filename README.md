@@ -3,25 +3,33 @@ Couch Incarnate
 
 A CouchDB tool for maintaining views of views (AKA chaining map-reduce operations).
 
-## Installation ##
-*   create the 'log' directory as detailed in the 'conf' file
-*   run:
-
-       ./bin/incarnate.js
-
 ### Requirements ###
 
 *   Node.js (tried on 0.4.5)
 *   CouchDB (tried on 1.0.1)
-*   Node's 'request' module
+*   NPM - Node's package manager (https://github.com/isaacs/npm)
+
+## Installation ##
+
+*   decompress files
+*   go into the files' directory
+*   run:
+
+       npm install request
+
+*   edit 'conf' file (if you wish)
+*   create the 'log' directory (detailed in 'conf'). Make sure you have permission to write to it
+*   done! Now run:
+
+       ./bin/incarnate.js
 
 ## Incarnation - the basic concept ##
 
 An incarnation is a CouchDB that is equivalent to a CouchDB view. Like a view, this DB is based on map and reduce functions, and each document in it is of the form '{key: ..., value: ...}'.
 
-Once an incarnation is set up, you could add to it a design-doc with a view (or more), ending up with what is effectively a view of a view.
+Once an incarnation is set up, you could add to it a design-doc with a view (or several), ending up with what is effectively a view of a view.
 
-More specifically, an incarnation is based on a source DB, a map-function, a reduce function, and a group-level. 
+To be more precise, an incarnation is based on a source DB, a map-function, a reduce function, and a group-level. 
 
 Contents are equivalent to the following query, if instead of an incarnation, a normal view were used, with the same map and reduce functions:
 
