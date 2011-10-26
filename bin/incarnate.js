@@ -32,7 +32,7 @@ var IncarnatorHandlers = function () {
       });
       newHandler.init( function (err) {
         if (err) {
-        log.info('failed to initialize handler for incarnator ' + incarnatorId);
+          log.info('failed to initialize handler for incarnator ' + incarnatorId);
           cb(new Error());
           return;
         }
