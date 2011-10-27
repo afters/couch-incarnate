@@ -161,7 +161,6 @@ Note: currently, unless running on Mac OS X, both CouchDB and Incarnate would pr
 
 - tests. Does this thing really work?
 - input validation
-- sandbox JS map functions
 - _changes
 
 ## Caveats ##
@@ -170,7 +169,6 @@ Note: currently, unless running on Mac OS X, both CouchDB and Incarnate would pr
 - limited input validation
 - limited error-handling
 - only JS map and reduce functions are supported
-- map functions aren't sandboxed
 - no SSL
 - no continuous changes-feed for incarnations
 
