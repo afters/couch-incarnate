@@ -68,7 +68,12 @@ var IncarnatorHandlers = function () {
   this.setupIncarnator = function (incarnatorId, incarnatorConf, reqId, cb) {
     handlerCall(incarnatorId, "setupIncarnator", [incarnatorConf, reqId, function (err) {
       if (err) {
-        cb(new HandlersError(IncarnatorHandlers.errorCodes.SERVER_ERROR));
+        if (err.code === IncarnatorHandler.errorCodes.BAD_CONF) {
+          cb(new HandlersError(IncarnatorHandlers.errorCodes.BAD_CONF));
+        }
+        else {
+          cb(new HandlersError(IncarnatorHandlers.errorCodes.SERVER_ERROR));
+        }
       }
       else {
         cb();
@@ -132,7 +137,8 @@ IncarnatorHandlers.errorCodes = {
   NO_SUCH_INCARNATION: 0,
   NO_SUCH_INCARNATOR: 1,
   SERVER_ERROR: 2,
-  INCARNATOR_DELETED: 3
+  INCARNATOR_DELETED: 3,
+  BAD_CONF: 4
 }
 
 var HandlersError = function (errCode) {
@@ -195,6 +201,10 @@ var msgs = {
   SERVER_ERROR: {
     statusCode: 500,
     body: {err: "server error"}
+  },
+  BAD_CONF: {
+    statusCode: 400,
+    body: {err: "bad configuration"}
   }
 }
 
@@ -286,7 +296,12 @@ var server = http.createServer( function (req, res) {
           log.trace(reqId + '\t' + 'call setup incarnator ' + incarnatorId);
           incarnatorHandlers.setupIncarnator(incarnatorId, incarnatorConf, reqId, function (err) {
             if (err) {
-              sendMsg(msgs.SERVER_ERROR);
+              if (err.code === IncarnatorHandlers.errorCodes.BAD_CONF) {
+                sendMsg(msgs.BAD_CONF);
+              }
+              else {
+                sendMsg(msgs.SERVER_ERROR);
+              }
             }
             else {
               sendMsg(msgs.INC_SETUP_SUCCESSFUL);
