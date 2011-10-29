@@ -222,7 +222,7 @@ var server = http.createServer( function (req, res) {
   var groupLevel = urlParts[2];
 
   var sendRes = function (statusCode, jsonBody) {
-    var bodyString = JSON.stringify(jsonBody);
+    var bodyString = JSON.stringify(jsonBody, null, '  ');
     log.trace(reqId + ':\t' + 'sending ' + statusCode + ': ' + bodyString);
     res.writeHead(statusCode, 'application/json');
     if (jsonBody) {
