@@ -147,6 +147,12 @@ If INCARNATOR\_NAME exists, overwrite it.
     DELETE /INCARNATOR_NAME
 
 
+#### Rename incarnator ####
+
+    MOVE /INCARNATOR_NAME
+    Destination: NEW_INCARNATOR_NAME
+
+
 #### Access incarnation ####
 
     METHOD_NAME /INCARNATOR_NAME/REDUCE_NAME/GROUP_LEVEL/[...]
