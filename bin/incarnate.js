@@ -87,7 +87,8 @@ var IncarnatorHandlers = function () {
   var setupIncarnator = function (incarnatorId, incarnatorConf, reqId, cb) {
     handlerCall(incarnatorId, "setupIncarnator", [incarnatorConf, reqId, function (err) {
       if (err) {
-        if (err instanceof HandlerError && err.code === IncarnatorHandler.errorCodes.BAD_CONF) {
+        if (err instanceof IncarnatorHandler.HandlerError && 
+            err.code === IncarnatorHandler.errorCodes.BAD_CONF) {
           cb(new HandlersError(IncarnatorHandlers.errorCodes.BAD_CONF));
         }
         else {
