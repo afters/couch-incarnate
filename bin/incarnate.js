@@ -5,6 +5,7 @@ var util = require('util'),
   url_lib = require('url'),
   http = require('http'),
   Persister = require('../lib/couch_persister'),
+  Queue = require('../lib/queue'),
   Logger = require('../lib/logger'),
   IncarnatorHandler = require('../lib/incarnatorHandler');
 
@@ -31,7 +32,7 @@ var createIncarnatorHandlers = function (cb) {
 
 var IncarnatorHandlers = function () {
 
-  var requests = [];
+  var requests = new Queue();
   var handlers = {};
   var busy = false;
   var activeAsyncOp;
@@ -75,7 +76,7 @@ var IncarnatorHandlers = function () {
   }
 
   this.setupIncarnator = function (incarnatorId, incarnatorConf, reqId, cb) {
-    requests.push({
+    requests.enqueue({
       type: 'setupIncarnator',
       incarnatorId: incarnatorId,
       incarnatorConf: incarnatorConf,
@@ -118,7 +119,7 @@ var IncarnatorHandlers = function () {
   }
 
   this.destroyIncarnator = function (incarnatorId, reqId, cb) {
-    requests.push({
+    requests.enqueue({
       type: 'destroyIncarnator',
       incarnatorId: incarnatorId,
       reqId: reqId,
@@ -143,7 +144,7 @@ var IncarnatorHandlers = function () {
   }
 
   this.getIncarnatorState = function (incarnatorId, reqId, cb) {
-    requests.push({
+    requests.enqueue({
       type: 'getIncarnatorState',
       incarnatorId: incarnatorId,
       reqId: reqId,
@@ -168,7 +169,7 @@ var IncarnatorHandlers = function () {
   }
 
   this.incarnationRequest = function (incarnatorId, opts, cb) {
-    requests.push({
+    requests.enqueue({
       type: 'incarnationRequest',
       incarnatorId: incarnatorId,
       opts: opts,
@@ -197,7 +198,7 @@ var IncarnatorHandlers = function () {
   }
 
   this.moveIncarnator = function (sourceId, targetId, reqId, cb) {
-    requests.push({
+    requests.enqueue({
       type: 'moveIncarnator',
       sourceId: sourceId,
       targetId: targetId,
@@ -298,11 +299,11 @@ var IncarnatorHandlers = function () {
     busy = true;
     var done = function () {
       busy = false;
-      if (requests.length) {
+      if (requests.getLength()) {
         process.nextTick(getBusy);
       }
     }
-    var req = requests.pop();
+    var req = requests.dequeue();
     if (!req) return;
     if (req.type === 'incarnationRequest') {
       incarnationRequest(req.incarnatorId, req.opts, req.cb);
