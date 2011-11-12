@@ -329,48 +329,25 @@ var IncarnatorHandlers = function () {
 
   }
 
-  var ensureHandlerExists = function (incarnatorId, cb) {
-    var newHandler;
-    if (!handlers[incarnatorId]) {
-      newHandler = new IncarnatorHandler({
+
+  var handlerCall = function (incarnatorId, fnName, args) {
+    var handler = handlers[incarnatorId] = handlers[incarnatorId] || 
+      new IncarnatorHandler({
         id: incarnatorId, 
         couchUrl: conf.couch, 
         persister: new Persister(conf.couch, 'incarnate', incarnatorId),
         log: log
       });
-      newHandler.init( function (err) {
-        if (err) {
-          log.info('failed to initialize handler for incarnator ' + incarnatorId);
-          cb(new Error());
-          return;
-        }
-        log.info('successfully initialized handler for incarnator ' + incarnatorId);
-        handlers[incarnatorId] = newHandler;
-        cb();
-      });
-      return;
+    var origCb = args[args.length - 1];
+    var newCb = function () {
+      if (!handler.incarnatorExists() && !handler.isInUse()) {
+        delete handlers[incarnatorId];
+      }
+      origCb.apply(this, arguments);
     }
-    cb();
-  }
-
-  var handlerCall = function (incarnatorId, fnName, args) {
-    ensureHandlerExists(incarnatorId, function (err) {
-      var handler = handlers[incarnatorId];
-      var origCb = args[args.length - 1];
-      if (err) {
-        origCb(new HandlersError(IncarnatorHandlers.errorCodes.SERVER_ERROR));
-        return;
-      }
-      var newCb = function () {
-        if (!handler.incarnatorExists() && !handler.isInUse()) {
-          delete handlers[incarnatorId];
-        }
-        origCb.apply(this, arguments);
-      }
-      var argsWithModifiedCb = [].concat(args);
-      argsWithModifiedCb[argsWithModifiedCb.length - 1] = newCb;
-      handler[fnName].apply(handler, argsWithModifiedCb);
-    });
+    var argsWithModifiedCb = [].concat(args);
+    argsWithModifiedCb[argsWithModifiedCb.length - 1] = newCb;
+    handler[fnName].apply(handler, argsWithModifiedCb);
   }
 
 }
