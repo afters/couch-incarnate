@@ -241,7 +241,7 @@ request(
     method: 'GET',
     uri: sourceDbUrl,
   }, function (err, res, body) {
-    if (err || res.statusCode !== 201) {
+    if (err || res.statusCode !== 200) {
       throw new Error('unable to access DB at: ' + sourceDbUrl)
     }
     basicCreateAndDelete();
