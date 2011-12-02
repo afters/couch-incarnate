@@ -5,8 +5,8 @@ A CouchDB tool for maintaining views of views (AKA chaining map-reduce operation
 
 ## Requirements ##
 
-*   Node.js (tried on 0.4.5)
-*   CouchDB (tried on 1.0.1)
+*   Node.js (tried on 0.6.2)
+*   CouchDB (tried on 1.1.1)
 *   NPM - Node's package manager (https://github.com/isaacs/npm)
 
 ## Installation ##
