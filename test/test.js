@@ -45,7 +45,7 @@ var basicConf = {
   "map": "function (doc) { \n  if (doc.score && doc.for !== undefined) {\n    emit(doc.for, doc.score); \n  }\n}",
   "reduces": {
     "count": {
-      "function": "function (key, values, rereduce) { \n  if (!rereduce) return values.length; \n  var count = 0; \n  for (var i = 0; i < values.length; i++) { \n    count += values[i]; \n  }; \n  return count; \n}\n",
+      "fn": "function (key, values, rereduce) { \n  if (!rereduce) return values.length; \n  var count = 0; \n  for (var i = 0; i < values.length; i++) { \n    count += values[i]; \n  }; \n  return count; \n}\n",
       "group_levels": [1]
     }
   }
