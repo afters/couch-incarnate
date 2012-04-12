@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var util = require('util'),
+  path = require('path'),
   fs = require('fs'),
   url_lib = require('url'),
   http = require('http'),
@@ -10,7 +11,7 @@ var util = require('util'),
   IncarnatorHandler = require('../lib/incarnatorHandler');
 
 
-var confFilePath = 'conf';
+var confFilePath = path.dirname(__dirname) + '/conf.json';
 var conf = JSON.parse(fs.readFileSync(confFilePath));
 var port = conf.port || 4895;
 var log = new Logger({

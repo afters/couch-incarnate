@@ -11,17 +11,14 @@ A CouchDB tool for maintaining views of views (AKA chaining map-reduce operation
 
 ## Installation ##
 
-*   decompress files
-*   go into the files' directory
 *   run:
 
-         npm install request
+         npm install couch-incarnate
 
-*   edit 'conf' file (if you wish)
-*   create the 'log' directory (detailed in 'conf'). Make sure you have permission to write to it
-*   done! Now run:
+*   edit 'conf.json' file. Remove the "log" entry to write to stdout.
+*   done! Now simply run:
 
-         ./bin/incarnate.js
+         incarnate
 
 ## Incarnation - the basic concept ##
 

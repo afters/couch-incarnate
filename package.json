@@ -1,0 +1,26 @@
+{
+  "name": "couch-incarnate",
+  "version": "0.2.0",
+  "description": "CouchDB views in DB-form; for chaining map-reduce operations",
+  "keywords": [
+    "couch",
+    "couchdb",
+    "incarnate"
+  ],
+  "author": {
+    "name": "Alon Keren",
+    "email": "alon.keren@gmail.com",
+    "web": "http://alon.me"
+  },
+  "license": "AGPLv3",
+  "dependencies": {
+    "request": ">=2.2.9"
+  },
+  "bin": {
+    "incarnate": "./bin/incarnate.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:afters/couch-incarnate.git"
+  }
+}
