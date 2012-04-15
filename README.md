@@ -47,7 +47,7 @@ An incarnator defines incarnations. All incarnations defined by it use the same 
       "map": "function (doc) { ... }",
       "reduces": {
         "REDUCE_1_NAME": {
-          "function": "function (key, values, rereduce) { ... }",
+          "fn": "function (key, values, rereduce) { ... }",
           "group_levels": [ GROUP_LEVEL1, GROUP_LEVEL2, ... ]
         },
         "INC_2_NAME": {
@@ -76,7 +76,7 @@ Now say you want to have an incarnation holding the number of users that join ea
       "map": "function (doc) { if (doc.type === "user") emit(doc.join_date.split('/')[0], null); }",
       "reduces": {
         "count": {
-          "function": "function (key, values, rereduce) { if (!rereduce) return {count: values.length}; var count = 0; for (var i = 0; i < values.length; i++) { count += values[i]; }; return count; }",
+          "fn": "function (key, values, rereduce) { if (!rereduce) return {count: values.length}; var count = 0; for (var i = 0; i < values.length; i++) { count += values[i]; }; return count; }",
           "group_levels": ['exact']
         }
       }
@@ -89,7 +89,7 @@ If you wanted also to have incarnations for the number of users that join each m
       "map": "function (doc) { if (doc.type === "user") emit(doc.join_date.split('/'), null); }",
       "reduces": {
         "count": {
-          "function": "function (key, values, rereduce) { if (!rereduce) return {count: values.length}; var count = 0; for (var i = 0; i < values.length; i++) { count += values[i]; }; return count; }",
+          "fn": "function (key, values, rereduce) { if (!rereduce) return {count: values.length}; var count = 0; for (var i = 0; i < values.length; i++) { count += values[i]; }; return count; }",
           "group_levels": [1, 2, 'exact']
         }
       }
@@ -121,7 +121,7 @@ Configuration file - ./conf :
       "map": "function (doc) { ... }",
       "reduces": {
         "REDUCE_1_NAME": {
-          "reduce": "function (key, values, rereduce) { ... }",
+          "fn": "function (key, values, rereduce) { ... }",
           "group_levels": [ GROUP_LEVEL1, GROUP_LEVEL2, ... ]
         },
         "REDUCE_2_NAME": {
