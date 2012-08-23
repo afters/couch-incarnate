@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/afters/couch-incarnate.png)](http://travis-ci.org/afters/couch-incarnate)
 Couch Incarnate
 ===============
 
